@@ -85,6 +85,9 @@ static BOOL _isInterceptedSelector(SEL sel)
 
 @implementation UITableView (CPDataDrivenLayout)
 
+#define DescriptionForAssert [NSString stringWithFormat:@"invoke %@ before must be set dataDrivenLayoutEnabled value to YES",NSStringFromSelector(_cmd)]
+#define CPDataDrivenLayoutEnabledAssert() NSAssert(self.dataDrivenLayoutEnabled, DescriptionForAssert)
+
 + (void)load {
     Class class = [self class];
     Method originalDelegateSetter = class_getInstanceMethod(class, @selector(setDelegate:));
@@ -176,15 +179,16 @@ static BOOL _isInterceptedSelector(SEL sel)
 #pragma mark - Reloading
 
 - (void)cp_reloadSections:(NSArray<CPDataDrivenLayoutSectionInfo *> * _Nonnull)sections {
-    if (!self.dataDrivenLayoutEnabled) {
-        return;
-    }
+    CPDataDrivenLayoutEnabledAssert();
+    
     [self setSections:sections];
     [self registerCellWithSections:sections];
     [self reloadData];
 }
 
 - (void)cp_reloadCellInfo:(CPDataDrivenLayoutCellInfo * _Nonnull)cellInfo atIndexPath:(NSIndexPath * _Nonnull)indexPath {
+    CPDataDrivenLayoutEnabledAssert();
+    
     CPDataDrivenLayoutSectionInfo *sectionInfo = [self cp_sectionInfoForSection:indexPath.section];
     if (sectionInfo) {
         [sectionInfo setCellInfo:cellInfo atIndex:indexPath.row];
@@ -208,6 +212,8 @@ static BOOL _isInterceptedSelector(SEL sel)
 #pragma mark - Appending And Inserting
 
 - (void)cp_appendSections:(NSArray<CPDataDrivenLayoutSectionInfo *> * _Nonnull)sections withRowAnimation:(UITableViewRowAnimation)animation {
+    CPDataDrivenLayoutEnabledAssert();
+    
     NSMutableArray *indexPaths = [NSMutableArray new];
     NSMutableArray *existSections = [self.sections mutableCopy];
     
@@ -242,6 +248,8 @@ static BOOL _isInterceptedSelector(SEL sel)
 }
 
 - (void)cp_insertCellInfos:(NSArray<CPDataDrivenLayoutCellInfo *> * _Nonnull)cellInfos atIndexPaths:(NSArray<NSIndexPath *> * _Nonnull)indexPaths withRowAnimation:(UITableViewRowAnimation)animation {
+    CPDataDrivenLayoutEnabledAssert();
+    
     NSMutableDictionary<NSNumber *, NSArray *> *sectionDict = [@{} mutableCopy];
     NSMutableDictionary<NSNumber *, NSArray *> *cellInfosDict = [@{} mutableCopy];
     
@@ -285,6 +293,8 @@ static BOOL _isInterceptedSelector(SEL sel)
 #pragma mark - Deleting
 
 - (void)cp_deleteCellInfoAtIndexPath:(NSIndexPath * _Nonnull)indexPath withRowAnimation:(UITableViewRowAnimation)animation {
+    CPDataDrivenLayoutEnabledAssert();
+    
     CPDataDrivenLayoutSectionInfo *sectionInfo = [self cp_sectionInfoForSection:indexPath.section];
     [sectionInfo deleteCellInfo:[self cp_cellInfoForRowAtIndexPath:indexPath]];
     
@@ -302,6 +312,8 @@ static BOOL _isInterceptedSelector(SEL sel)
 }
 
 - (void)cp_deleteCellInfosInSection:(NSInteger)section atIndexSet:(NSIndexSet * _Nonnull)indexSet withRowAnimation:(UITableViewRowAnimation)animation {
+    CPDataDrivenLayoutEnabledAssert();
+    
     CPDataDrivenLayoutSectionInfo *sectionInfo = [self cp_sectionInfoForSection:section];
     [sectionInfo deleteCellInfosAtIndexSet:indexSet];
     
@@ -320,6 +332,8 @@ static BOOL _isInterceptedSelector(SEL sel)
 #pragma mark - Get Cell And Section Info
 
 - (CPDataDrivenLayoutCellInfo * _Nullable)cp_cellInfoForRowAtIndexPath:(NSIndexPath * _Nonnull)indexPath {
+    CPDataDrivenLayoutEnabledAssert();
+    
     NSArray *cellInfos = [[self cp_sectionInfoForSection:indexPath.section] cellInfos];
     if (indexPath.row<cellInfos.count) {
         return [cellInfos objectAtIndex:indexPath.row];
@@ -328,6 +342,8 @@ static BOOL _isInterceptedSelector(SEL sel)
 }
 
 - (CPDataDrivenLayoutSectionInfo * _Nullable)cp_sectionInfoForSection:(NSInteger)section {
+    CPDataDrivenLayoutEnabledAssert();
+    
     if (section<self.sections.count) {
         return [self.sections objectAtIndex:section];
     }
@@ -337,6 +353,8 @@ static BOOL _isInterceptedSelector(SEL sel)
 #pragma mark - Other
 
 - (NSArray<NSString *> * _Nonnull)cp_sectionIndexTitles {
+    CPDataDrivenLayoutEnabledAssert();
+    
     NSMutableArray *titles = [NSMutableArray new];
     [self.sections enumerateObjectsUsingBlock:^(CPDataDrivenLayoutSectionInfo * _Nonnull sectionInfo, NSUInteger idx, BOOL * _Nonnull stop) {
         if (sectionInfo.indexTitle) {
