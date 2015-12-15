@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "CPDataDrivenLayout"
-  s.version      = "0.1.0"
+  s.version      = "0.1.1"
   s.summary      = "Data driven content for UITableView"
   s.homepage     = "https://github.com/caoping/CPDataDrivenLayout"
 
