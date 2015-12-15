@@ -24,27 +24,6 @@
 #import <objc/runtime.h>
 #import <UITableView+FDTemplateLayoutCell/UITableView+FDTemplateLayoutCell.h>
 
-static BOOL _isInterceptedSelector(SEL sel)
-{
-    return (//UITableViewDataSource
-            sel == @selector(numberOfSectionsInTableView:) ||
-            sel == @selector(tableView:numberOfRowsInSection:) ||
-            sel == @selector(tableView:cellForRowAtIndexPath:) ||
-            
-            //UITableViewDelegate
-            sel == @selector(tableView:heightForRowAtIndexPath:) ||
-            sel == @selector(tableView:didSelectRowAtIndexPath:) ||
-            sel == @selector(tableView:willDisplayCell:forRowAtIndexPath:) ||
-            sel == @selector(tableView:willDisplayHeaderView:forSection:) ||
-            
-            sel == @selector(tableView:sectionForSectionIndexTitle:atIndex:) ||
-            sel == @selector(sectionIndexTitlesForTableView:) ||
-            
-            sel == @selector(tableView:titleForHeaderInSection:) ||
-            sel == @selector(tableView:titleForFooterInSection:)
-            );
-}
-
 @interface _CPTableViewProxy : NSProxy
 
 @property (nonatomic, weak) id<NSObject> target;
@@ -69,12 +48,12 @@ static BOOL _isInterceptedSelector(SEL sel)
 
 - (BOOL)respondsToSelector:(SEL)aSelector
 {
-    return (_isInterceptedSelector(aSelector) || [_target respondsToSelector:aSelector]);
+    return ([_interceptor respondsToSelector:aSelector] || [_target respondsToSelector:aSelector]);
 }
 
 - (id)forwardingTargetForSelector:(SEL)aSelector
 {
-    if (_isInterceptedSelector(aSelector)) {
+    if ([_interceptor respondsToSelector:aSelector]) {
         return _interceptor;
     }
     
@@ -190,8 +169,9 @@ static BOOL _isInterceptedSelector(SEL sel)
     CPDataDrivenLayoutEnabledAssert();
     
     CPDataDrivenLayoutSectionInfo *sectionInfo = [self cp_sectionInfoForSection:indexPath.section];
-    if (sectionInfo) {
-        [sectionInfo setCellInfo:cellInfo atIndex:indexPath.row];
+    if (sectionInfo && indexPath.row<sectionInfo.numberOfObjects) {
+        [sectionInfo updateCellInfo:cellInfo atIndex:indexPath.row];
+        [self.fd_indexPathHeightCache invalidateHeightAtIndexPath:indexPath];
         
         //if cell is visible, reload immediately
         NSArray *indexPaths = [self indexPathsForVisibleRows];
@@ -420,16 +400,6 @@ static BOOL _isInterceptedSelector(SEL sel)
     CPDataDrivenLayoutCellInfo *cellInfo = [self cp_cellInfoForRowAtIndexPath:indexPath];
     if (cellInfo.cellWillDisplayCallback) {
         cellInfo.cellWillDisplayCallback(tableView,cell,indexPath,cellInfo.data);
-    }
-}
-
-/**
- *  override section header text (the section header text is uppercase string by default)
- */
-- (void)tableView:(UITableView *)tableView willDisplayHeaderView:(UIView *)view forSection:(NSInteger)section {
-    NSString *titleForHeaderInSection = [self cp_sectionInfoForSection:section].titleForHeaderInSection;
-    if (titleForHeaderInSection && [view isKindOfClass:[UITableViewHeaderFooterView class]]) {
-        [view setValue:titleForHeaderInSection forKeyPath:@"_label.text"];
     }
 }
 

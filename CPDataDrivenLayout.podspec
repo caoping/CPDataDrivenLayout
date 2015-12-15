@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.platform     = :ios, "7.0"
 
   s.source       = { :git => "https://github.com/caoping/CPDataDrivenLayout.git", :tag => s.version }
-  s.source_files = "CPDataDrivenLayout/*.{h,m}"
+  s.source_files = "CPDataDrivenLayout/*.{h,m}", "CPDataDrivenLayout/Additional/*.{h,m}"
   s.requires_arc = true
   s.dependency "UITableView+FDTemplateLayoutCell", "1.4.beta"
 end

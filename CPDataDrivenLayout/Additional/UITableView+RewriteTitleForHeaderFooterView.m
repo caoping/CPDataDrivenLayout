@@ -20,32 +20,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#import <Foundation/Foundation.h>
-#import "CPDataDrivenLayoutCellInfo.h"
+#import "UITableView+RewriteTitleForHeaderFooterView.h"
+#import "UITableView+CPDataDrivenLayout.h"
 
-@interface CPDataDrivenLayoutSectionInfo : NSObject
+@implementation UITableView (RewriteTitleForHeaderFooterView)
 
-@property (nonatomic, readonly) NSUInteger numberOfObjects;
-@property (nonatomic, readonly) NSArray<CPDataDrivenLayoutCellInfo *> *cellInfos;
-@property (nonatomic) NSString *indexTitle;
-@property (nonatomic) NSString *titleForHeaderInSection;
-@property (nonatomic) NSString *titleForFooterInSection;
-
-
-- (instancetype)initWithCellInfos:(NSArray<CPDataDrivenLayoutCellInfo *> *)cellInfos;
-
-#pragma mark - Appending And Inserting
-
-- (void)appendCellInfos:(NSArray<CPDataDrivenLayoutCellInfo *> *)cellInfos;
-- (void)insertCellInfos:(NSArray<CPDataDrivenLayoutCellInfo *> *)cellInfos atIndexSet:(NSIndexSet *)indexSet;
-
-#pragma mark - Update
-
-- (void)updateCellInfo:(CPDataDrivenLayoutCellInfo *)cellInfo atIndex:(NSUInteger)index;
-
-#pragma mark - Deleting
-
-- (void)deleteCellInfosAtIndexSet:(NSIndexSet *)indexSet;
-- (void)deleteCellInfo:(CPDataDrivenLayoutCellInfo *)cellInfo;
+/**
+ *  rewrite title for header (the section header title is uppercase string by default)
+ */
+- (void)tableView:(UITableView *)tableView willDisplayHeaderView:(UIView *)view forSection:(NSInteger)section {
+    NSString *titleForHeaderInSection = [self cp_sectionInfoForSection:section].titleForHeaderInSection;
+    if (titleForHeaderInSection && [view isKindOfClass:[UITableViewHeaderFooterView class]]) {
+        [view setValue:titleForHeaderInSection forKeyPath:@"_label.text"];
+    }
+}
 
 @end

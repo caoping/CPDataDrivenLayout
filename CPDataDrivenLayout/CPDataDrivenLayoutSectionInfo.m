@@ -38,13 +38,15 @@
     return _cellInfos?_cellInfos.count:0;
 }
 
+#pragma mark - Appending And Inserting
+
 - (void)appendCellInfos:(NSArray<CPDataDrivenLayoutCellInfo *> *)cellInfos {
     NSMutableArray *infos = [_cellInfos mutableCopy];
     [infos addObjectsFromArray:cellInfos];
     _cellInfos = [infos copy];
 }
 
-- (void)insertCellInfos:(NSArray<CPDataDrivenLayoutCellInfo *> *)cellInfos atIndexSet:(NSIndexSet *)indexSet {
+- (void)updateCellInfo:(NSArray<CPDataDrivenLayoutCellInfo *> *)cellInfos atIndexSet:(NSIndexSet *)indexSet {
     NSAssert(cellInfos.count==indexSet.count, @"cellInfos count must equals to indexSet count");
     
     NSMutableArray *infos = [_cellInfos mutableCopy];
@@ -57,13 +59,17 @@
     _cellInfos = [infos copy];
 }
 
-- (void)setCellInfo:(CPDataDrivenLayoutCellInfo *)cellInfo atIndex:(NSUInteger)index {
+#pragma mark - Update
+
+- (void)updateCellInfo:(CPDataDrivenLayoutCellInfo *)cellInfo atIndex:(NSUInteger)index {
     NSAssert(index<[_cellInfos count], @"index out of cellInfos bounds");
     
     NSMutableArray *infos = [_cellInfos mutableCopy];
     infos[index] = cellInfo;
     _cellInfos = [infos copy];
 }
+
+#pragma mark - Deleting
 
 - (void)deleteCellInfosAtIndexSet:(NSIndexSet *)indexSet {
     NSMutableArray *objectsForDelete = [NSMutableArray new];
