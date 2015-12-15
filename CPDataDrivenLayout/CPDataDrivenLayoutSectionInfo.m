@@ -46,7 +46,7 @@
     _cellInfos = [infos copy];
 }
 
-- (void)updateCellInfo:(NSArray<CPDataDrivenLayoutCellInfo *> *)cellInfos atIndexSet:(NSIndexSet *)indexSet {
+- (void)insertCellInfos:(NSArray<CPDataDrivenLayoutCellInfo *> *)cellInfos atIndexSet:(NSIndexSet *)indexSet {
     NSAssert(cellInfos.count==indexSet.count, @"cellInfos count must equals to indexSet count");
     
     NSMutableArray *infos = [_cellInfos mutableCopy];
