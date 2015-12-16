@@ -30,29 +30,21 @@ typedef void (^CPDataDrivenLayoutCellInfoCallbackBlock)(UITableView *tableView, 
 @property (nonatomic, readonly) Class cellClass;
 @property (nonatomic, readonly) NSString *cellReuseIdentifier;
 @property (nonatomic, readonly) UINib *nib;//can be nil
-@property (nonatomic) NSString *identifier;
+@property (nonatomic) NSString *identifier;//string used to identify cell info
 @property (nonatomic) CGFloat rowHeight;//default value is UITableViewAutomaticDimension,mean use autolayout to calculate row height
 @property (nonatomic) id data;
 @property (nonatomic, copy) CPDataDrivenLayoutCellInfoCallbackBlock cellDidReuseCallback;
 @property (nonatomic, copy) CPDataDrivenLayoutCellInfoCallbackBlock cellDidSelectCallback;
-@property (nonatomic, copy) CPDataDrivenLayoutCellInfoCallbackBlock cellWillDisplayCallback;
 
-- (instancetype)initWithCellClass:(Class)cellClass
-                              nib:(UINib *)nib;
+#pragma mark - Designated Initializer
 
-- (instancetype)initWithCellClass:(Class)cellClass
-                              nib:(UINib *)nib
-                             data:(id)data;
+- (instancetype)initWithCellClass:(Class)cellClass nib:(UINib *)nib data:(id)data cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock)cellDidReuseCallback cellDidSelectCallback:(CPDataDrivenLayoutCellInfoCallbackBlock)cellDidSelectCallback NS_DESIGNATED_INITIALIZER;
 
-- (instancetype)initWithCellClass:(Class)cellClass
-                              nib:(UINib *)nib
-                             data:(id)data
-             cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock)cellDidReuseCallback;
+#pragma mark - Convenience Initializers
 
-- (instancetype)initWithCellClass:(Class)cellClass
-                              nib:(UINib *)nib
-                             data:(id)data
-             cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock)cellDidReuseCallback
-            cellDidSelectCallback:(CPDataDrivenLayoutCellInfoCallbackBlock)cellDidSelectCallback;
+- (instancetype)initWithCellClass:(Class)cellClass nib:(UINib *)nib;
+- (instancetype)initWithCellClass:(Class)cellClass nib:(UINib *)nib data:(id)data;
+- (instancetype)initWithCellClass:(Class)cellClass nib:(UINib *)nib data:(id)data cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock)cellDidReuseCallback;
+
 
 @end

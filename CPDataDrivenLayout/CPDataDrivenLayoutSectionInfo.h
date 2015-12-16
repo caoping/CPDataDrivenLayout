@@ -31,8 +31,7 @@
 @property (nonatomic) NSString *titleForHeaderInSection;
 @property (nonatomic) NSString *titleForFooterInSection;
 
-
-- (instancetype)initWithCellInfos:(NSArray<CPDataDrivenLayoutCellInfo *> *)cellInfos;
+- (instancetype)initWithCellInfos:(NSArray<CPDataDrivenLayoutCellInfo *> *)cellInfos NS_DESIGNATED_INITIALIZER;
 
 #pragma mark - Appending And Inserting
 

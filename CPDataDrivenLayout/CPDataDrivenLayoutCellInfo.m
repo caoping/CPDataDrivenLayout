@@ -24,7 +24,9 @@
 
 @implementation CPDataDrivenLayoutCellInfo
 
-- (instancetype)initWithCellClass:(Class)cellClass nib:(UINib *)nib
+#pragma mark - Designated Initializer
+
+- (instancetype)initWithCellClass:(Class)cellClass nib:(UINib *)nib data:(id)data cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock)cellDidReuseCallback cellDidSelectCallback:(CPDataDrivenLayoutCellInfoCallbackBlock)cellDidSelectCallback
 {
     self = [super init];
     if (self) {
@@ -32,43 +34,35 @@
         _cellClass = cellClass;
         _cellReuseIdentifier = [NSStringFromClass(cellClass) stringByAppendingString:@"_Identifier"];
         _nib = nib;
+        _data = data;
         _rowHeight = UITableViewAutomaticDimension;
+        _cellDidReuseCallback = [cellDidReuseCallback copy];
+        _cellDidSelectCallback = [cellDidSelectCallback copy];
     }
     return self;
+}
+
+#pragma mark - Convenience Initializers
+
+- (instancetype)init {
+    self = [self initWithCellClass:[UITableViewCell class] nib:nil data:nil cellDidReuseCallback:nil cellDidSelectCallback:nil];
+    self.rowHeight = 44;
+    return self;
+}
+
+- (instancetype)initWithCellClass:(Class)cellClass nib:(UINib *)nib
+{
+    return [self initWithCellClass:cellClass nib:nib data:nil cellDidReuseCallback:nil cellDidSelectCallback:nil];
 }
 
 - (instancetype)initWithCellClass:(Class)cellClass nib:(UINib *)nib data:(id)data
 {
-    self = [self initWithCellClass:cellClass nib:nib];
-    if (self) {
-        self.data = data;
-    }
-    return self;
+    return [self initWithCellClass:cellClass nib:nib data:data cellDidReuseCallback:nil cellDidSelectCallback:nil];
 }
 
-- (instancetype)initWithCellClass:(Class)cellClass
-                              nib:(UINib *)nib
-                             data:(id)data
-             cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock)cellDidReuseCallback
+- (instancetype)initWithCellClass:(Class)cellClass nib:(UINib *)nib data:(id)data cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock)cellDidReuseCallback
 {
-    self = [self initWithCellClass:cellClass nib:nib data:data];
-    if (self) {
-        _cellDidReuseCallback = [cellDidReuseCallback copy];
-    }
-    return self;
-}
-
-- (instancetype)initWithCellClass:(Class)cellClass
-                              nib:(UINib *)nib
-                             data:(id)data
-             cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock)cellDidReuseCallback
-            cellDidSelectCallback:(CPDataDrivenLayoutCellInfoCallbackBlock)cellDidSelectCallback
-{
-    self = [self initWithCellClass:cellClass nib:nib data:data cellDidReuseCallback:cellDidReuseCallback];
-    if (self) {
-        _cellDidSelectCallback = [cellDidSelectCallback copy];
-    }
-    return self;
+    return [self initWithCellClass:cellClass nib:nib data:data cellDidReuseCallback:cellDidReuseCallback cellDidSelectCallback:nil];
 }
 
 @end

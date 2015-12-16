@@ -395,14 +395,6 @@
     return index;
 }
 
-- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    CPDataDrivenLayoutCellInfo *cellInfo = [self cp_cellInfoForRowAtIndexPath:indexPath];
-    if (cellInfo.cellWillDisplayCallback) {
-        cellInfo.cellWillDisplayCallback(tableView,cell,indexPath,cellInfo.data);
-    }
-}
-
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     CPDataDrivenLayoutCellInfo *cellInfo = [self cp_cellInfoForRowAtIndexPath:indexPath];

@@ -24,6 +24,10 @@
 
 @implementation CPDataDrivenLayoutSectionInfo
 
+- (instancetype)init {
+    return [self initWithCellInfos:@[[CPDataDrivenLayoutCellInfo new]]];
+}
+
 - (instancetype)initWithCellInfos:(NSArray<CPDataDrivenLayoutCellInfo *> *)cellInfos {
     self = [super init];
     if (self) {
