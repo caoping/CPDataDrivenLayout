@@ -26,25 +26,25 @@
 @interface CPDataDrivenLayoutSectionInfo : NSObject
 
 @property (nonatomic, readonly) NSUInteger numberOfObjects;
-@property (nonatomic, readonly) NSArray<CPDataDrivenLayoutCellInfo *> *cellInfos;
-@property (nonatomic) NSString *indexTitle;
-@property (nonatomic) NSString *titleForHeaderInSection;
-@property (nonatomic) NSString *titleForFooterInSection;
+@property (nonatomic, readonly) NSArray<CPDataDrivenLayoutCellInfo *> * _Nonnull cellInfos;
+@property (nonatomic) NSString * _Nullable indexTitle;
+@property (nonatomic) NSString * _Nullable titleForHeaderInSection;
+@property (nonatomic) NSString * _Nullable titleForFooterInSection;
 
-- (instancetype)initWithCellInfos:(NSArray<CPDataDrivenLayoutCellInfo *> *)cellInfos NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nonnull)initWithCellInfos:(NSArray<CPDataDrivenLayoutCellInfo *> * _Nonnull)cellInfos NS_DESIGNATED_INITIALIZER;
 
 #pragma mark - Appending And Inserting
 
-- (void)appendCellInfos:(NSArray<CPDataDrivenLayoutCellInfo *> *)cellInfos;
-- (void)insertCellInfos:(NSArray<CPDataDrivenLayoutCellInfo *> *)cellInfos atIndexSet:(NSIndexSet *)indexSet;
+- (void)appendCellInfos:(NSArray<CPDataDrivenLayoutCellInfo *> * _Nonnull)cellInfos;
+- (void)insertCellInfos:(NSArray<CPDataDrivenLayoutCellInfo *> * _Nonnull)cellInfos atIndexSet:(NSIndexSet * _Nonnull)indexSet;
 
 #pragma mark - Update
 
-- (void)updateCellInfo:(CPDataDrivenLayoutCellInfo *)cellInfo atIndex:(NSUInteger)index;
+- (void)updateCellInfo:(CPDataDrivenLayoutCellInfo * _Nonnull)cellInfo atIndex:(NSUInteger)index;
 
 #pragma mark - Deleting
 
-- (void)deleteCellInfosAtIndexSet:(NSIndexSet *)indexSet;
-- (void)deleteCellInfo:(CPDataDrivenLayoutCellInfo *)cellInfo;
+- (void)deleteCellInfosAtIndexSet:(NSIndexSet * _Nonnull)indexSet;
+- (void)deleteCellInfo:(CPDataDrivenLayoutCellInfo * _Nonnull)cellInfo;
 
 @end

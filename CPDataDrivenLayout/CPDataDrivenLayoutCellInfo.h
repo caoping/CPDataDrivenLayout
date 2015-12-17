@@ -23,28 +23,28 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
-typedef void (^CPDataDrivenLayoutCellInfoCallbackBlock)(UITableView *tableView, id cell, NSIndexPath *indexPath, id data);
+typedef void (^CPDataDrivenLayoutCellInfoCallbackBlock)(UITableView * _Nonnull tableView, id _Nonnull cell, NSIndexPath * _Nonnull indexPath, id _Nullable data);
 
 @interface CPDataDrivenLayoutCellInfo : NSObject
 
-@property (nonatomic, readonly) Class cellClass;
-@property (nonatomic, readonly) NSString *cellReuseIdentifier;
-@property (nonatomic, readonly) UINib *nib;//can be nil
-@property (nonatomic) NSString *identifier;//string used to identify cell info
+@property (nonatomic, readonly) Class _Nonnull cellClass;
+@property (nonatomic, readonly) NSString * _Nonnull cellReuseIdentifier;
+@property (nonatomic, readonly) UINib * _Nullable nib;//can be nil
+@property (nonatomic) NSString * _Nullable identifier;//string used to identify cell info
 @property (nonatomic) CGFloat rowHeight;//default value is UITableViewAutomaticDimension,mean use autolayout to calculate row height
-@property (nonatomic) id data;
-@property (nonatomic, copy) CPDataDrivenLayoutCellInfoCallbackBlock cellDidReuseCallback;
-@property (nonatomic, copy) CPDataDrivenLayoutCellInfoCallbackBlock cellDidSelectCallback;
+@property (nonatomic) id _Nullable data;
+@property (nonatomic, copy) CPDataDrivenLayoutCellInfoCallbackBlock _Nullable cellDidReuseCallback;
+@property (nonatomic, copy) CPDataDrivenLayoutCellInfoCallbackBlock _Nullable cellDidSelectCallback;
 
 #pragma mark - Designated Initializer
 
-- (instancetype)initWithCellClass:(Class)cellClass nib:(UINib *)nib data:(id)data cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock)cellDidReuseCallback cellDidSelectCallback:(CPDataDrivenLayoutCellInfoCallbackBlock)cellDidSelectCallback NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nonnull)initWithCellClass:(Class _Nonnull)cellClass nib:(UINib * _Nullable)nib data:(id _Nullable)data cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock _Nullable)cellDidReuseCallback cellDidSelectCallback:(CPDataDrivenLayoutCellInfoCallbackBlock _Nullable)cellDidSelectCallback NS_DESIGNATED_INITIALIZER;
 
 #pragma mark - Convenience Initializers
 
-- (instancetype)initWithCellClass:(Class)cellClass nib:(UINib *)nib;
-- (instancetype)initWithCellClass:(Class)cellClass nib:(UINib *)nib data:(id)data;
-- (instancetype)initWithCellClass:(Class)cellClass nib:(UINib *)nib data:(id)data cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock)cellDidReuseCallback;
+- (instancetype _Nonnull)initWithCellClass:(Class _Nonnull)cellClass nib:(UINib * _Nullable)nib;
+- (instancetype _Nonnull)initWithCellClass:(Class _Nonnull)cellClass nib:(UINib * _Nullable)nib data:(id _Nullable)data;
+- (instancetype _Nonnull)initWithCellClass:(Class _Nonnull)cellClass nib:(UINib * _Nullable)nib data:(id _Nullable)data cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock _Nullable)cellDidReuseCallback;
 
 
 @end

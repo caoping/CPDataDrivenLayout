@@ -28,7 +28,7 @@
     return [self initWithCellInfos:@[[CPDataDrivenLayoutCellInfo new]]];
 }
 
-- (instancetype)initWithCellInfos:(NSArray<CPDataDrivenLayoutCellInfo *> *)cellInfos {
+- (instancetype _Nonnull)initWithCellInfos:(NSArray<CPDataDrivenLayoutCellInfo *> * _Nonnull)cellInfos {
     self = [super init];
     if (self) {
         NSParameterAssert(cellInfos);
@@ -44,13 +44,13 @@
 
 #pragma mark - Appending And Inserting
 
-- (void)appendCellInfos:(NSArray<CPDataDrivenLayoutCellInfo *> *)cellInfos {
+- (void)appendCellInfos:(NSArray<CPDataDrivenLayoutCellInfo *> * _Nonnull)cellInfos {
     NSMutableArray *infos = [_cellInfos mutableCopy];
     [infos addObjectsFromArray:cellInfos];
     _cellInfos = [infos copy];
 }
 
-- (void)insertCellInfos:(NSArray<CPDataDrivenLayoutCellInfo *> *)cellInfos atIndexSet:(NSIndexSet *)indexSet {
+- (void)insertCellInfos:(NSArray<CPDataDrivenLayoutCellInfo *> * _Nonnull)cellInfos atIndexSet:(NSIndexSet * _Nonnull)indexSet {
     NSAssert(cellInfos.count==indexSet.count, @"cellInfos count must equals to indexSet count");
     
     NSMutableArray *infos = [_cellInfos mutableCopy];
@@ -65,7 +65,7 @@
 
 #pragma mark - Update
 
-- (void)updateCellInfo:(CPDataDrivenLayoutCellInfo *)cellInfo atIndex:(NSUInteger)index {
+- (void)updateCellInfo:(CPDataDrivenLayoutCellInfo * _Nonnull)cellInfo atIndex:(NSUInteger)index {
     NSAssert(index<[_cellInfos count], @"index out of cellInfos bounds");
     
     NSMutableArray *infos = [_cellInfos mutableCopy];
@@ -75,7 +75,7 @@
 
 #pragma mark - Deleting
 
-- (void)deleteCellInfosAtIndexSet:(NSIndexSet *)indexSet {
+- (void)deleteCellInfosAtIndexSet:(NSIndexSet * _Nonnull)indexSet {
     NSMutableArray *objectsForDelete = [NSMutableArray new];
     [indexSet enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
         [objectsForDelete addObject:[self.cellInfos objectAtIndex:idx]];
@@ -86,7 +86,7 @@
     _cellInfos = [cellInfos copy];
 }
 
-- (void)deleteCellInfo:(CPDataDrivenLayoutCellInfo *)cellInfo {
+- (void)deleteCellInfo:(CPDataDrivenLayoutCellInfo * _Nonnull)cellInfo {
     NSMutableArray *cellInfos = [_cellInfos mutableCopy];
     [cellInfos removeObject:cellInfo];
     _cellInfos = [cellInfos copy];

@@ -26,7 +26,7 @@
 
 #pragma mark - Designated Initializer
 
-- (instancetype)initWithCellClass:(Class)cellClass nib:(UINib *)nib data:(id)data cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock)cellDidReuseCallback cellDidSelectCallback:(CPDataDrivenLayoutCellInfoCallbackBlock)cellDidSelectCallback
+- (instancetype _Nonnull)initWithCellClass:(Class _Nonnull)cellClass nib:(UINib * _Nullable)nib data:(id _Nullable)data cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock _Nullable)cellDidReuseCallback cellDidSelectCallback:(CPDataDrivenLayoutCellInfoCallbackBlock _Nullable)cellDidSelectCallback
 {
     self = [super init];
     if (self) {
@@ -50,17 +50,17 @@
     return self;
 }
 
-- (instancetype)initWithCellClass:(Class)cellClass nib:(UINib *)nib
+- (instancetype _Nonnull)initWithCellClass:(Class)cellClass nib:(UINib *)nib
 {
     return [self initWithCellClass:cellClass nib:nib data:nil cellDidReuseCallback:nil cellDidSelectCallback:nil];
 }
 
-- (instancetype)initWithCellClass:(Class)cellClass nib:(UINib *)nib data:(id)data
+- (instancetype _Nonnull)initWithCellClass:(Class _Nonnull)cellClass nib:(UINib * _Nullable)nib data:(id _Nullable)data
 {
     return [self initWithCellClass:cellClass nib:nib data:data cellDidReuseCallback:nil cellDidSelectCallback:nil];
 }
 
-- (instancetype)initWithCellClass:(Class)cellClass nib:(UINib *)nib data:(id)data cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock)cellDidReuseCallback
+- (instancetype _Nonnull)initWithCellClass:(Class _Nonnull)cellClass nib:(UINib * _Nullable)nib data:(id _Nullable)data cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock _Nullable)cellDidReuseCallback
 {
     return [self initWithCellClass:cellClass nib:nib data:data cellDidReuseCallback:cellDidReuseCallback cellDidSelectCallback:nil];
 }

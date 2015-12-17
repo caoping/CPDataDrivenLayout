@@ -27,7 +27,7 @@
 @interface _CPTableViewProxy : NSProxy
 
 @property (nonatomic, weak) id<NSObject> target;
-@property (nonatomic, weak) UITableView *interceptor;
+@property (nonatomic, unsafe_unretained) UITableView *interceptor;
 
 - (instancetype)initWithTarget:(id<NSObject>)target interceptor:(UITableView *)interceptor;
 
