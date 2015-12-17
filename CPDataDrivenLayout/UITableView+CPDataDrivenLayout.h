@@ -22,10 +22,12 @@
 
 #import <UIKit/UIKit.h>
 #import "CPDataDrivenLayoutSectionInfo.h"
+#import "CPTableViewDelegateInterceptor.h"
 
 @interface UITableView (CPDataDrivenLayout)
 
 @property (nonatomic) BOOL dataDrivenLayoutEnabled;
+@property (nonatomic) CPTableViewDelegateInterceptor * _Nonnull interceptor;
 @property (nonatomic, readonly) NSArray<CPDataDrivenLayoutSectionInfo *> * _Nonnull sections;
 
 #pragma mark - Reloading

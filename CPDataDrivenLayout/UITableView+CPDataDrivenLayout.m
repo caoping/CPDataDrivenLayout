@@ -22,20 +22,19 @@
 
 #import "UITableView+CPDataDrivenLayout.h"
 #import <objc/runtime.h>
-#import <UITableView+FDTemplateLayoutCell/UITableView+FDTemplateLayoutCell.h>
 
 @interface _CPTableViewProxy : NSProxy
 
 @property (nonatomic, weak) id<NSObject> target;
-@property (nonatomic, unsafe_unretained) UITableView *interceptor;
+@property (nonatomic, weak) CPTableViewDelegateInterceptor *interceptor;
 
-- (instancetype)initWithTarget:(id<NSObject>)target interceptor:(UITableView *)interceptor;
+- (instancetype)initWithTarget:(id<NSObject>)target interceptor:(CPTableViewDelegateInterceptor *)interceptor;
 
 @end
 
 @implementation _CPTableViewProxy
 
-- (instancetype)initWithTarget:(id<NSObject>)target interceptor:(UITableView *)interceptor
+- (instancetype)initWithTarget:(id<NSObject>)target interceptor:(CPTableViewDelegateInterceptor *)interceptor
 {
     if (!self) {
         return nil;
@@ -68,18 +67,21 @@
 #define CPDataDrivenLayoutEnabledAssert() NSAssert(self.dataDrivenLayoutEnabled, DescriptionForAssert)
 
 + (void)load {
-    Class class = [self class];
-    Method originalDelegateSetter = class_getInstanceMethod(class, @selector(setDelegate:));
-    Method myDelegateSetter = class_getInstanceMethod(class, @selector(cp_setDelegate:));
-    if (originalDelegateSetter && myDelegateSetter) {
-        method_exchangeImplementations(originalDelegateSetter, myDelegateSetter);
-    }
-    
-    Method originalDataSourceSetter = class_getInstanceMethod(class, @selector(setDataSource:));
-    Method myDataSourceSetter = class_getInstanceMethod(class, @selector(cp_setDataSource:));
-    if (originalDataSourceSetter && myDataSourceSetter) {
-        method_exchangeImplementations(originalDataSourceSetter, myDataSourceSetter);
-    }
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        Class class = [self class];
+        Method originalDelegateSetter = class_getInstanceMethod(class, @selector(setDelegate:));
+        Method myDelegateSetter = class_getInstanceMethod(class, @selector(cp_setDelegate:));
+        if (originalDelegateSetter && myDelegateSetter) {
+            method_exchangeImplementations(originalDelegateSetter, myDelegateSetter);
+        }
+        
+        Method originalDataSourceSetter = class_getInstanceMethod(class, @selector(setDataSource:));
+        Method myDataSourceSetter = class_getInstanceMethod(class, @selector(cp_setDataSource:));
+        if (originalDataSourceSetter && myDataSourceSetter) {
+            method_exchangeImplementations(originalDataSourceSetter, myDataSourceSetter);
+        }
+    });
 }
 
 #pragma mark - Associated Object
@@ -90,6 +92,22 @@
 
 - (void)setDataDrivenLayoutEnabled:(BOOL)dataDrivenLayoutEnabled {
     objc_setAssociatedObject(self, @selector(dataDrivenLayoutEnabled), @(dataDrivenLayoutEnabled), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    
+    [self setDelegate:self.delegate];
+    [self setDataSource:self.dataSource];
+}
+
+- (CPTableViewDelegateInterceptor *)interceptor {
+    id __interceptor = objc_getAssociatedObject(self, @selector(interceptor));
+    if (!__interceptor) {
+        __interceptor = [CPTableViewDelegateInterceptor new];
+        [self setInterceptor:__interceptor];
+    }
+    return __interceptor;
+}
+
+- (void)setInterceptor:(CPTableViewDelegateInterceptor *)interceptor {
+    objc_setAssociatedObject(self, @selector(interceptor), interceptor, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     
     [self setDelegate:self.delegate];
     [self setDataSource:self.dataSource];
@@ -126,33 +144,33 @@
 #pragma mark - Delegate and DataSource Proxy
 
 - (void)cp_setDelegate:(id<UITableViewDelegate>)delegate {
-    id delegateProxy;
     if (self.dataDrivenLayoutEnabled) {
-        delegateProxy = [[_CPTableViewProxy alloc] initWithTarget:delegate interceptor:self];
+        id delegateProxy = [[_CPTableViewProxy alloc] initWithTarget:delegate interceptor:self.interceptor];
         [self cp_setDelegate:delegateProxy];
+        [self setTableViewDelegateProxy:delegateProxy];
     }else{
-        __weak id target = delegate;
+        __weak id originalDelegate = delegate;
         if ([delegate isKindOfClass:[_CPTableViewProxy class]]) {
-            target = [self.tableViewDelegateProxy target];
+            originalDelegate = [self.tableViewDelegateProxy target];
         }
-        [self cp_setDelegate:target];
+        [self cp_setDelegate:originalDelegate];
+        [self setTableViewDelegateProxy:nil];
     }
-    [self setTableViewDelegateProxy:delegateProxy];
 }
 
 - (void)cp_setDataSource:(id<UITableViewDataSource>)dataSource {
-    id dataSourceProxy;
     if (self.dataDrivenLayoutEnabled) {
-        dataSourceProxy = [[_CPTableViewProxy alloc] initWithTarget:dataSource interceptor:self];
+        id dataSourceProxy = [[_CPTableViewProxy alloc] initWithTarget:dataSource interceptor:self.interceptor];
         [self cp_setDataSource:dataSourceProxy];
+        [self setTableViewDataSourceProxy:dataSourceProxy];
     }else{
-        __weak id target = dataSource;
+        __weak id originalDataSource = dataSource;
         if ([dataSource isKindOfClass:[_CPTableViewProxy class]]) {
-            target = [self.tableViewDataSourceProxy target];
+            originalDataSource = [self.tableViewDataSourceProxy target];
         }
-        [self cp_setDataSource:target];
+        [self cp_setDataSource:originalDataSource];
+        [self setTableViewDataSourceProxy:nil];
     }
-    [self setTableViewDataSourceProxy:dataSourceProxy];
 }
 
 #pragma mark - Reloading
@@ -330,20 +348,6 @@
     return nil;
 }
 
-#pragma mark - Other
-
-- (NSArray<NSString *> * _Nonnull)cp_sectionIndexTitles {
-    CPDataDrivenLayoutEnabledAssert();
-    
-    NSMutableArray *titles = [NSMutableArray new];
-    [self.sections enumerateObjectsUsingBlock:^(CPDataDrivenLayoutSectionInfo * _Nonnull sectionInfo, NSUInteger idx, BOOL * _Nonnull stop) {
-        if (sectionInfo.indexTitle) {
-            [titles addObject:sectionInfo.indexTitle];
-        }
-    }];
-    return titles;
-}
-
 #pragma mark - Register Cell
 
 - (void)registerCellWithSections:(NSArray<CPDataDrivenLayoutSectionInfo *> *)sections {
@@ -366,100 +370,6 @@
     }else{
         [self registerClass:cellInfo.cellClass forCellReuseIdentifier:cellInfo.cellReuseIdentifier];
     }
-}
-
-#pragma mark - UITableViewDelegate
-
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-{
-    CPDataDrivenLayoutSectionInfo *sectionInfo = [self cp_sectionInfoForSection:section];
-    return sectionInfo?sectionInfo.titleForHeaderInSection:nil;
-}
-
-- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
-{
-    CPDataDrivenLayoutSectionInfo *sectionInfo = [self cp_sectionInfoForSection:section];
-    return sectionInfo?sectionInfo.titleForFooterInSection:nil;
-}
-
-- (NSArray *)sectionIndexTitlesForTableView:(UITableView *)tableView
-{
-    return [self cp_sectionIndexTitles];
-}
-
-- (NSInteger)tableView:(UITableView *)tableView sectionForSectionIndexTitle:(NSString *)title atIndex:(NSInteger)index
-{
-    NSIndexPath *selectIndexPath = [NSIndexPath indexPathForRow:0 inSection:index];
-    [tableView scrollToRowAtIndexPath:selectIndexPath atScrollPosition:UITableViewScrollPositionBottom animated:NO];
-    
-    return index;
-}
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    CPDataDrivenLayoutCellInfo *cellInfo = [self cp_cellInfoForRowAtIndexPath:indexPath];
-    if (cellInfo.cellDidSelectCallback) {
-        cellInfo.cellDidSelectCallback(tableView,[tableView cellForRowAtIndexPath:indexPath],indexPath,cellInfo.data);
-    }
-}
-
-static Class __UIMutableIndexPathClass;
-
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    if (!__UIMutableIndexPathClass) {
-        __UIMutableIndexPathClass = NSClassFromString(@"UIMutableIndexPath");
-    }
-    
-    if ([indexPath isKindOfClass:__UIMutableIndexPathClass]) {
-        indexPath = [NSIndexPath indexPathForRow:indexPath.row inSection:indexPath.section];
-    }
-    
-    CPDataDrivenLayoutCellInfo *cellInfo = [self cp_cellInfoForRowAtIndexPath:indexPath];
-    if (cellInfo.rowHeight != UITableViewAutomaticDimension) {
-        return cellInfo.rowHeight;
-    }
-    
-    //use UITableView+FDTemplateLayoutCell to calculate row height (https://github.com/forkingdog/UITableView-FDTemplateLayoutCell)
-    CGFloat height = [tableView fd_heightForCellWithIdentifier:cellInfo.cellReuseIdentifier cacheByIndexPath:indexPath configuration:^(UITableViewCell *cell) {
-        if (cellInfo.cellDidReuseCallback) {
-            cellInfo.cellDidReuseCallback(tableView,cell,indexPath,cellInfo.data);
-        }
-    }];
-    
-    return height;
-}
-
-#pragma mark - UITableViewDataSource
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
-    return self.sections.count>0?self.sections.count:1;
-}
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    CPDataDrivenLayoutSectionInfo *sectionInfo = [self cp_sectionInfoForSection:section];
-    if (sectionInfo) {
-        return sectionInfo.numberOfObjects;
-    }
-    return 0;
-}
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    UITableViewCell *cell;
-    
-    CPDataDrivenLayoutCellInfo *cellInfo = [self cp_cellInfoForRowAtIndexPath:indexPath];
-    if (cellInfo) {
-        cell = [tableView dequeueReusableCellWithIdentifier:cellInfo.cellReuseIdentifier
-                                               forIndexPath:indexPath];
-        
-        if (cellInfo.cellDidReuseCallback) {
-            cellInfo.cellDidReuseCallback(tableView,cell,indexPath,cellInfo.data);
-        }
-    }
-    
-    return cell;
 }
 
 @end
