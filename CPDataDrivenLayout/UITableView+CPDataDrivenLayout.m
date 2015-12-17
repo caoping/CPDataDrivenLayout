@@ -22,6 +22,7 @@
 
 #import "UITableView+CPDataDrivenLayout.h"
 #import <objc/runtime.h>
+#import <UITableView+FDTemplateLayoutCell/UITableView+FDTemplateLayoutCell.h>
 
 @interface _CPTableViewProxy : NSProxy
 
