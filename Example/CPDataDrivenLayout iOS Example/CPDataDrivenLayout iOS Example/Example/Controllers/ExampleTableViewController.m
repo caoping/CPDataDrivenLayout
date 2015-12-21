@@ -16,6 +16,10 @@
 
 @implementation ExampleTableViewController
 
+- (void)dealloc {
+    
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -26,10 +30,14 @@
                                                                  action:@selector(reset)];
     self.navigationItem.leftBarButtonItem = resetItem;
     
+    UIBarButtonItem *reloadItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
+                                                                             target:self
+                                                                             action:@selector(reload)];
+
     UIBarButtonItem *addItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
                                                                              target:self
                                                                              action:@selector(add)];
-    self.navigationItem.rightBarButtonItem = addItem;
+    self.navigationItem.rightBarButtonItems = @[reloadItem,addItem];
     
     
     self.tableView.dataDrivenLayoutEnabled = YES;
@@ -42,6 +50,15 @@
                                                @{@"title":@"mock website 3", @"url":@"http://www.bing.com/"},
                                                @{@"title":@"mock website 4", @"url":@"http://www.bing.com/"}];
     [self.tableView cp_reloadSections:[self sectionsByJSONArray:mockDataArray]];
+}
+
+- (void)reload {
+    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+    CPDataDrivenLayoutCellInfo *cellInfo = [self.tableView cp_cellInfoForRowAtIndexPath:indexPath];
+    if (cellInfo) {
+        cellInfo.rowHeight = 300;
+        [self.tableView cp_reloadCellInfo:cellInfo atIndexPath:indexPath];
+    }
 }
 
 - (void)add {
@@ -63,7 +80,7 @@
     [JSONArray enumerateObjectsUsingBlock:^(NSDictionary * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         
         //you can use Cell Class or Cell Nib to create cell info
-        CPDataDrivenLayoutCellInfo *cellInfo = [[CPDataDrivenLayoutCellInfo alloc] initWithCellClass:[UITableViewCell class] nib:nil data:obj cellDidReuseCallback:^(UITableView *tableView, UITableViewCell *cell, NSIndexPath *indexPath, NSDictionary *data) {
+        CPDataDrivenLayoutCellInfo *cellInfo = [[CPDataDrivenLayoutCellInfo alloc] initWithCellClass:[UITableViewCell class] nib:nil cellReuseIdentifier:nil data:obj cellDidReuseCallback:^(UITableView *tableView, UITableViewCell *cell, NSIndexPath *indexPath, NSDictionary *data) {
             
             //config cell (Notes: be careful strong reference cycle, use weak self in callback)
             cell.textLabel.text = [data valueForKey:@"title"];

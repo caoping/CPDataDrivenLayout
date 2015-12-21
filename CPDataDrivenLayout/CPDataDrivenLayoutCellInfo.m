@@ -26,13 +26,13 @@
 
 #pragma mark - Designated Initializer
 
-- (instancetype _Nonnull)initWithCellClass:(Class _Nonnull)cellClass nib:(UINib * _Nullable)nib data:(id _Nullable)data cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock _Nullable)cellDidReuseCallback cellDidSelectCallback:(CPDataDrivenLayoutCellInfoCallbackBlock _Nullable)cellDidSelectCallback
+- (instancetype _Nonnull)initWithCellClass:(Class _Nonnull)cellClass nib:(UINib * _Nullable)nib cellReuseIdentifier:(NSString * _Nullable)cellReuseIdentifier data:(id _Nullable)data cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock _Nullable)cellDidReuseCallback cellDidSelectCallback:(CPDataDrivenLayoutCellInfoCallbackBlock _Nullable)cellDidSelectCallback
 {
     self = [super init];
     if (self) {
         NSParameterAssert(cellClass);
         _cellClass = cellClass;
-        _cellReuseIdentifier = [NSStringFromClass(cellClass) stringByAppendingString:@"_Identifier"];
+        _cellReuseIdentifier = cellReuseIdentifier?:[NSStringFromClass(cellClass) stringByAppendingString:@"_ReuseIdentifier"];
         _nib = nib;
         _data = data;
         _rowHeight = UITableViewAutomaticDimension;
@@ -45,24 +45,24 @@
 #pragma mark - Convenience Initializers
 
 - (instancetype)init {
-    self = [self initWithCellClass:[UITableViewCell class] nib:nil data:nil cellDidReuseCallback:nil cellDidSelectCallback:nil];
+    self = [self initWithCellClass:[UITableViewCell class] nib:nil cellReuseIdentifier:nil data:nil cellDidReuseCallback:nil cellDidSelectCallback:nil];
     self.rowHeight = 44;
     return self;
 }
 
-- (instancetype _Nonnull)initWithCellClass:(Class)cellClass nib:(UINib *)nib
+- (instancetype _Nonnull)initWithCellClass:(Class)cellClass nib:(UINib *)nib cellReuseIdentifier:(NSString * _Nullable)cellReuseIdentifier
 {
-    return [self initWithCellClass:cellClass nib:nib data:nil cellDidReuseCallback:nil cellDidSelectCallback:nil];
+    return [self initWithCellClass:cellClass nib:nib cellReuseIdentifier:cellReuseIdentifier data:nil cellDidReuseCallback:nil cellDidSelectCallback:nil];
 }
 
-- (instancetype _Nonnull)initWithCellClass:(Class _Nonnull)cellClass nib:(UINib * _Nullable)nib data:(id _Nullable)data
+- (instancetype _Nonnull)initWithCellClass:(Class _Nonnull)cellClass nib:(UINib * _Nullable)nib cellReuseIdentifier:(NSString * _Nullable)cellReuseIdentifier data:(id _Nullable)data
 {
-    return [self initWithCellClass:cellClass nib:nib data:data cellDidReuseCallback:nil cellDidSelectCallback:nil];
+    return [self initWithCellClass:cellClass nib:nib cellReuseIdentifier:cellReuseIdentifier data:data cellDidReuseCallback:nil cellDidSelectCallback:nil];
 }
 
-- (instancetype _Nonnull)initWithCellClass:(Class _Nonnull)cellClass nib:(UINib * _Nullable)nib data:(id _Nullable)data cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock _Nullable)cellDidReuseCallback
+- (instancetype _Nonnull)initWithCellClass:(Class _Nonnull)cellClass nib:(UINib * _Nullable)nib cellReuseIdentifier:(NSString * _Nullable)cellReuseIdentifier data:(id _Nullable)data cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock _Nullable)cellDidReuseCallback
 {
-    return [self initWithCellClass:cellClass nib:nib data:data cellDidReuseCallback:cellDidReuseCallback cellDidSelectCallback:nil];
+    return [self initWithCellClass:cellClass nib:nib cellReuseIdentifier:cellReuseIdentifier data:data cellDidReuseCallback:cellDidReuseCallback cellDidSelectCallback:nil];
 }
 
 @end

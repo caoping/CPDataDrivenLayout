@@ -366,6 +366,13 @@
 }
 
 - (void)registerCellWithCellInfo:(CPDataDrivenLayoutCellInfo * _Nonnull)cellInfo {
+    NSDictionary *nibMap = [self valueForKey:@"_nibMap"];
+    NSDictionary *cellClassDict = [self valueForKey:@"_cellClassDict"];
+    if ([nibMap objectForKey:cellInfo.cellReuseIdentifier] ||
+        [cellClassDict objectForKey:cellInfo.cellReuseIdentifier]) {
+        //prevent repeat register cell
+        return;
+    }
     if (cellInfo.nib) {
         [self registerNib:cellInfo.nib forCellReuseIdentifier:cellInfo.cellReuseIdentifier];
     }else{
