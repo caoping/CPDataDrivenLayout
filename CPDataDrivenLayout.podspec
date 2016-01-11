@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "CPDataDrivenLayout"
-  s.version      = "0.2.1"
+  s.version      = "0.2.2"
   s.summary      = "Data driven content for UITableView"
   s.homepage     = "https://github.com/caoping/CPDataDrivenLayout"
 
@@ -14,5 +14,5 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/caoping/CPDataDrivenLayout.git", :tag => s.version }
   s.source_files = "CPDataDrivenLayout/*.{h,m}", "CPDataDrivenLayout/Additional/*.{h,m}"
   s.requires_arc = true
-  s.dependency "UITableView+FDTemplateLayoutCell", "1.4.beta"
+  s.dependency "UITableView+FDTemplateLayoutCell", "1.4"
 end
