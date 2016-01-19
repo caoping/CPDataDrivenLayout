@@ -34,6 +34,7 @@
 
 - (void)cp_reloadSections:(NSArray<CPDataDrivenLayoutSectionInfo *> * _Nonnull)sections;
 - (void)cp_reloadCellInfo:(CPDataDrivenLayoutCellInfo * _Nonnull)cellInfo atIndexPath:(NSIndexPath * _Nonnull)indexPath;
+- (void)cp_reloadCellAtIndexPath:(NSIndexPath * _Nonnull)indexPath;
 
 #pragma mark - Appending And Inserting
 

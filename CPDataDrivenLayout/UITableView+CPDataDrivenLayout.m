@@ -67,6 +67,8 @@
 #define DescriptionForAssert [NSString stringWithFormat:@"invoke %@ before must be set dataDrivenLayoutEnabled value to YES",NSStringFromSelector(_cmd)]
 #define CPDataDrivenLayoutEnabledAssert() NSAssert(self.dataDrivenLayoutEnabled, DescriptionForAssert)
 
+#pragma mark - Method Exchange
+
 + (void)load {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -81,6 +83,12 @@
         Method myDataSourceSetter = class_getInstanceMethod(class, @selector(cp_setDataSource:));
         if (originalDataSourceSetter && myDataSourceSetter) {
             method_exchangeImplementations(originalDataSourceSetter, myDataSourceSetter);
+        }
+        
+        Method originalDealloc = class_getInstanceMethod(class, NSSelectorFromString(@"dealloc"));
+        Method myDealloc = class_getInstanceMethod(class, @selector(cp_dealloc));
+        if (originalDealloc && myDealloc) {
+            method_exchangeImplementations(originalDealloc, myDealloc);
         }
     });
 }
@@ -110,6 +118,7 @@
 - (void)setInterceptor:(CPTableViewDelegateInterceptor *)interceptor {
     objc_setAssociatedObject(self, @selector(interceptor), interceptor, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     
+    //update interceptor
     [self setDelegate:self.delegate];
     [self setDataSource:self.dataSource];
 }
@@ -142,36 +151,76 @@
     objc_setAssociatedObject(self, @selector(sections), sections?:@[], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-#pragma mark - Delegate and DataSource Proxy
+#pragma mark - Method Exchange Implementations
 
 - (void)cp_setDelegate:(id<UITableViewDelegate>)delegate {
-    if (self.dataDrivenLayoutEnabled) {
-        id delegateProxy = [[_CPTableViewProxy alloc] initWithTarget:delegate interceptor:self.interceptor];
-        [self cp_setDelegate:delegateProxy];
-        [self setTableViewDelegateProxy:delegateProxy];
-    }else{
-        __weak id originalDelegate = delegate;
-        if ([delegate isKindOfClass:[_CPTableViewProxy class]]) {
-            originalDelegate = [self.tableViewDelegateProxy target];
-        }
-        [self cp_setDelegate:originalDelegate];
-        [self setTableViewDelegateProxy:nil];
+    __weak id __delegate = delegate;
+    if ([__delegate class] == [_CPTableViewProxy class]) {
+        __delegate = [(_CPTableViewProxy *)__delegate target];
     }
+    if (self.dataDrivenLayoutEnabled) {
+        __delegate = [self createOrUpdateProxyWithDelegate:__delegate interceptor:self.interceptor];
+    } else {
+        [self deleteDelegateProxy];
+    }
+    [self cp_setDelegate:__delegate];
 }
 
 - (void)cp_setDataSource:(id<UITableViewDataSource>)dataSource {
-    if (self.dataDrivenLayoutEnabled) {
-        id dataSourceProxy = [[_CPTableViewProxy alloc] initWithTarget:dataSource interceptor:self.interceptor];
-        [self cp_setDataSource:dataSourceProxy];
-        [self setTableViewDataSourceProxy:dataSourceProxy];
-    }else{
-        __weak id originalDataSource = dataSource;
-        if ([dataSource isKindOfClass:[_CPTableViewProxy class]]) {
-            originalDataSource = [self.tableViewDataSourceProxy target];
-        }
-        [self cp_setDataSource:originalDataSource];
-        [self setTableViewDataSourceProxy:nil];
+    __weak id __dataSource = dataSource;
+    if ([__dataSource class] == [_CPTableViewProxy class]) {
+        __dataSource = [(_CPTableViewProxy *)__dataSource target];
     }
+    if (self.dataDrivenLayoutEnabled) {
+        __dataSource = [self createOrUpdateProxyWithDataSource:__dataSource interceptor:self.interceptor];
+    } else {
+        [self deleteDataSourceProxy];
+    }
+    [self cp_setDataSource:__dataSource];
+}
+
+- (void)cp_dealloc {
+    self.delegate = nil;
+    self.dataSource = nil;
+    [self cp_dealloc];
+}
+
+#pragma mark - Create or Update Proxy
+
+- (_CPTableViewProxy *)createOrUpdateProxyWithDelegate:(id<UITableViewDelegate>)delegate interceptor:(CPTableViewDelegateInterceptor *)interceptor {
+    _CPTableViewProxy *delegateProxy = [self tableViewDelegateProxy];
+    if (!delegateProxy) {
+        delegateProxy = [[_CPTableViewProxy alloc] initWithTarget:delegate interceptor:interceptor];
+    } else {
+        delegateProxy.target = delegate;
+        delegateProxy.interceptor = interceptor;
+    }
+    
+    [self setTableViewDelegateProxy:delegateProxy];
+    return delegateProxy;
+}
+
+- (_CPTableViewProxy *)createOrUpdateProxyWithDataSource:(id<UITableViewDataSource>)dataSource interceptor:(CPTableViewDelegateInterceptor *)interceptor {
+    _CPTableViewProxy *dataSourceProxy = [self tableViewDataSourceProxy];
+    if (!dataSourceProxy) {
+        dataSourceProxy = [[_CPTableViewProxy alloc] initWithTarget:dataSource interceptor:interceptor];
+    } else {
+        dataSourceProxy.target = dataSource;
+        dataSourceProxy.interceptor = interceptor;
+    }
+    
+    [self setTableViewDataSourceProxy:dataSourceProxy];
+    return dataSourceProxy;
+}
+
+#pragma mark - Delete Proxy
+
+- (void)deleteDelegateProxy {
+    [self setTableViewDelegateProxy:nil];
+}
+
+- (void)deleteDataSourceProxy {
+    [self setTableViewDataSourceProxy:nil];
 }
 
 #pragma mark - Reloading
@@ -205,6 +254,13 @@
                 [UIView setAnimationsEnabled:YES];
             }
         }];
+    }
+}
+
+- (void)cp_reloadCellAtIndexPath:(NSIndexPath * _Nonnull)indexPath {
+    CPDataDrivenLayoutCellInfo *cellInfo = [self cp_cellInfoForRowAtIndexPath:indexPath];
+    if (cellInfo) {
+        [self cp_reloadCellInfo:cellInfo atIndexPath:indexPath];
     }
 }
 
