@@ -23,7 +23,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
-typedef void (^CPDataDrivenLayoutCellInfoCallbackBlock)(UITableView * _Nonnull tableView, id _Nonnull cell, NSIndexPath * _Nonnull indexPath, id _Nullable data);
+typedef void (^CPDataDrivenLayoutCellInfoCallbackBlock)(__kindof UITableView * _Nonnull tableView, __kindof UITableViewCell * _Nonnull cell, NSIndexPath * _Nonnull indexPath, __kindof NSObject * _Nullable data);
 
 @interface CPDataDrivenLayoutCellInfo : NSObject
 
@@ -32,19 +32,19 @@ typedef void (^CPDataDrivenLayoutCellInfoCallbackBlock)(UITableView * _Nonnull t
 @property (nonatomic, readonly) UINib * _Nullable nib;//can be nil
 @property (nonatomic) NSString * _Nullable identifier;//string used to identify cell info
 @property (nonatomic) CGFloat rowHeight;//default value is UITableViewAutomaticDimension,mean use autolayout to calculate row height
-@property (nonatomic) id _Nullable data;
+@property (nonatomic) __kindof NSObject * _Nullable data;
 @property (nonatomic, copy) CPDataDrivenLayoutCellInfoCallbackBlock _Nullable cellDidReuseCallback;
 @property (nonatomic, copy) CPDataDrivenLayoutCellInfoCallbackBlock _Nullable cellDidSelectCallback;
 
 #pragma mark - Designated Initializer
 
-- (instancetype _Nonnull)initWithCellClass:(Class _Nonnull)cellClass nib:(UINib * _Nullable)nib cellReuseIdentifier:(NSString * _Nullable)cellReuseIdentifier data:(id _Nullable)data cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock _Nullable)cellDidReuseCallback cellDidSelectCallback:(CPDataDrivenLayoutCellInfoCallbackBlock _Nullable)cellDidSelectCallback NS_DESIGNATED_INITIALIZER;
+- (instancetype _Nonnull)initWithCellClass:(Class _Nonnull)cellClass nib:(UINib * _Nullable)nib cellReuseIdentifier:(NSString * _Nullable)cellReuseIdentifier data:(__kindof NSObject * _Nullable)data cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock _Nullable)cellDidReuseCallback cellDidSelectCallback:(CPDataDrivenLayoutCellInfoCallbackBlock _Nullable)cellDidSelectCallback NS_DESIGNATED_INITIALIZER;
 
 #pragma mark - Convenience Initializers
 
 - (instancetype _Nonnull)initWithCellClass:(Class _Nonnull)cellClass nib:(UINib * _Nullable)nib cellReuseIdentifier:(NSString * _Nullable)cellReuseIdentifier;
-- (instancetype _Nonnull)initWithCellClass:(Class _Nonnull)cellClass nib:(UINib * _Nullable)nib cellReuseIdentifier:(NSString * _Nullable)cellReuseIdentifier data:(id _Nullable)data;
-- (instancetype _Nonnull)initWithCellClass:(Class _Nonnull)cellClass nib:(UINib * _Nullable)nib cellReuseIdentifier:(NSString * _Nullable)cellReuseIdentifier data:(id _Nullable)data cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock _Nullable)cellDidReuseCallback;
+- (instancetype _Nonnull)initWithCellClass:(Class _Nonnull)cellClass nib:(UINib * _Nullable)nib cellReuseIdentifier:(NSString * _Nullable)cellReuseIdentifier data:(__kindof NSObject * _Nullable)data;
+- (instancetype _Nonnull)initWithCellClass:(Class _Nonnull)cellClass nib:(UINib * _Nullable)nib cellReuseIdentifier:(NSString * _Nullable)cellReuseIdentifier data:(__kindof NSObject * _Nullable)data cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock _Nullable)cellDidReuseCallback;
 
 
 @end

@@ -26,7 +26,7 @@
 
 #pragma mark - Designated Initializer
 
-- (instancetype _Nonnull)initWithCellClass:(Class _Nonnull)cellClass nib:(UINib * _Nullable)nib cellReuseIdentifier:(NSString * _Nullable)cellReuseIdentifier data:(id _Nullable)data cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock _Nullable)cellDidReuseCallback cellDidSelectCallback:(CPDataDrivenLayoutCellInfoCallbackBlock _Nullable)cellDidSelectCallback
+- (instancetype _Nonnull)initWithCellClass:(Class _Nonnull)cellClass nib:(UINib * _Nullable)nib cellReuseIdentifier:(NSString * _Nullable)cellReuseIdentifier data:(__kindof NSObject * _Nullable)data cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock _Nullable)cellDidReuseCallback cellDidSelectCallback:(CPDataDrivenLayoutCellInfoCallbackBlock _Nullable)cellDidSelectCallback
 {
     self = [super init];
     if (self) {
@@ -55,12 +55,12 @@
     return [self initWithCellClass:cellClass nib:nib cellReuseIdentifier:cellReuseIdentifier data:nil cellDidReuseCallback:nil cellDidSelectCallback:nil];
 }
 
-- (instancetype _Nonnull)initWithCellClass:(Class _Nonnull)cellClass nib:(UINib * _Nullable)nib cellReuseIdentifier:(NSString * _Nullable)cellReuseIdentifier data:(id _Nullable)data
+- (instancetype _Nonnull)initWithCellClass:(Class _Nonnull)cellClass nib:(UINib * _Nullable)nib cellReuseIdentifier:(NSString * _Nullable)cellReuseIdentifier data:(__kindof NSObject * _Nullable)data
 {
     return [self initWithCellClass:cellClass nib:nib cellReuseIdentifier:cellReuseIdentifier data:data cellDidReuseCallback:nil cellDidSelectCallback:nil];
 }
 
-- (instancetype _Nonnull)initWithCellClass:(Class _Nonnull)cellClass nib:(UINib * _Nullable)nib cellReuseIdentifier:(NSString * _Nullable)cellReuseIdentifier data:(id _Nullable)data cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock _Nullable)cellDidReuseCallback
+- (instancetype _Nonnull)initWithCellClass:(Class _Nonnull)cellClass nib:(UINib * _Nullable)nib cellReuseIdentifier:(NSString * _Nullable)cellReuseIdentifier data:(__kindof NSObject * _Nullable)data cellDidReuseCallback:(CPDataDrivenLayoutCellInfoCallbackBlock _Nullable)cellDidReuseCallback
 {
     return [self initWithCellClass:cellClass nib:nib cellReuseIdentifier:cellReuseIdentifier data:data cellDidReuseCallback:cellDidReuseCallback cellDidSelectCallback:nil];
 }
