@@ -180,8 +180,8 @@
 }
 
 - (void)cp_dealloc {
-    self.delegate = nil;
-    self.dataSource = nil;
+    [self deleteDelegateProxy];
+    [self deleteDataSourceProxy];
     [self cp_dealloc];
 }
 
