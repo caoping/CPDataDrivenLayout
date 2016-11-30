@@ -24,31 +24,39 @@
 #import "CPDataDrivenLayoutSectionInfo.h"
 #import "CPTableViewDelegateInterceptor.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface UITableView (CPDataDrivenLayout)
 
 @property (nonatomic) BOOL dataDrivenLayoutEnabled;
-@property (nonatomic) CPTableViewDelegateInterceptor * _Nonnull interceptor;
-@property (nonatomic, readonly) NSArray<CPDataDrivenLayoutSectionInfo *> * _Nonnull sections;
+@property (nonatomic) CPTableViewDelegateInterceptor *interceptor;
+@property (nonatomic, readonly) NSArray<CPDataDrivenLayoutSectionInfo *> *sections;
 
 #pragma mark - Reloading
 
-- (void)cp_reloadSections:(NSArray<CPDataDrivenLayoutSectionInfo *> * _Nonnull)sections;
-- (void)cp_reloadCellInfo:(CPDataDrivenLayoutCellInfo * _Nonnull)cellInfo atIndexPath:(NSIndexPath * _Nonnull)indexPath;
-- (void)cp_reloadCellAtIndexPath:(NSIndexPath * _Nonnull)indexPath;
+- (void)cp_reloadSections:(NSArray<CPDataDrivenLayoutSectionInfo *> *)sections;
+- (void)cp_reloadSectionInfo:(CPDataDrivenLayoutSectionInfo *)sectionInfo inSection:(NSInteger)inSection withRowAnimation:(UITableViewRowAnimation)animation;
+
+- (void)cp_reloadCellInfo:(CPDataDrivenLayoutCellInfo *)cellInfo atIndexPath:(NSIndexPath *)indexPath;
+- (void)cp_reloadCellAtIndexPath:(NSIndexPath *)indexPath;
 
 #pragma mark - Appending And Inserting
 
-- (void)cp_appendSections:(NSArray<CPDataDrivenLayoutSectionInfo *> * _Nonnull)sections withRowAnimation:(UITableViewRowAnimation)animation;
-- (void)cp_insertCellInfos:(NSArray<CPDataDrivenLayoutCellInfo *> * _Nonnull)cellInfos atIndexPaths:(NSArray<NSIndexPath *> * _Nonnull)indexPaths withRowAnimation:(UITableViewRowAnimation)animation;
+- (void)cp_appendSections:(NSArray<CPDataDrivenLayoutSectionInfo *> *)sections withRowAnimation:(UITableViewRowAnimation)animation;
+- (void)cp_insertSectionInfo:(CPDataDrivenLayoutSectionInfo *)sectionInfo inSection:(NSInteger)inSection withRowAnimation:(UITableViewRowAnimation)animation;
+
+- (void)cp_insertCellInfos:(NSArray<CPDataDrivenLayoutCellInfo *> *)cellInfos atIndexPaths:(NSArray<NSIndexPath *> *)indexPaths withRowAnimation:(UITableViewRowAnimation)animation;
 
 #pragma mark - Deleting
 
-- (void)cp_deleteCellInfoAtIndexPath:(NSIndexPath * _Nonnull)indexPath withRowAnimation:(UITableViewRowAnimation)animation;
-- (void)cp_deleteCellInfosInSection:(NSInteger)section atIndexSet:(NSIndexSet * _Nonnull)indexSet withRowAnimation:(UITableViewRowAnimation)animation;
+- (void)cp_deleteCellInfoAtIndexPath:(NSIndexPath *)indexPath withRowAnimation:(UITableViewRowAnimation)animation;
+- (void)cp_deleteCellInfosInSection:(NSInteger)section atIndexSet:(NSIndexSet *)indexSet withRowAnimation:(UITableViewRowAnimation)animation;
 
 #pragma mark - Get Cell And Section Info
 
-- (CPDataDrivenLayoutCellInfo * _Nullable)cp_cellInfoForRowAtIndexPath:(NSIndexPath * _Nonnull)indexPath;
-- (CPDataDrivenLayoutSectionInfo * _Nullable)cp_sectionInfoForSection:(NSInteger)section;
+- (nullable CPDataDrivenLayoutCellInfo *)cp_cellInfoForRowAtIndexPath:(NSIndexPath *)indexPath;
+- (nullable CPDataDrivenLayoutSectionInfo *)cp_sectionInfoForSection:(NSInteger)section;
 
 @end
+
+NS_ASSUME_NONNULL_END

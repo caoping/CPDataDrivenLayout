@@ -233,13 +233,26 @@
     [self reloadData];
 }
 
+- (void)cp_reloadSectionInfo:(CPDataDrivenLayoutSectionInfo *)sectionInfo inSection:(NSInteger)inSection withRowAnimation:(UITableViewRowAnimation)animation {
+    CPDataDrivenLayoutEnabledAssert();
+    
+    if (sectionInfo && inSection < self.sections.count) {
+        [self invalidateCellHeightCacheInSection:inSection];
+        NSMutableArray *mSections = [self.sections mutableCopy];
+        mSections[inSection] = sectionInfo;
+        [self setSections:[mSections copy]];
+        [self registerCellWithSections:@[sectionInfo]];
+        [self reloadSections:[NSIndexSet indexSetWithIndex:inSection] withRowAnimation:animation];
+    }
+}
+
 - (void)cp_reloadCellInfo:(CPDataDrivenLayoutCellInfo * _Nonnull)cellInfo atIndexPath:(NSIndexPath * _Nonnull)indexPath {
     CPDataDrivenLayoutEnabledAssert();
     
     CPDataDrivenLayoutSectionInfo *sectionInfo = [self cp_sectionInfoForSection:indexPath.section];
     if (sectionInfo && indexPath.row<sectionInfo.numberOfObjects) {
         [sectionInfo updateCellInfo:cellInfo atIndex:indexPath.row];
-        [self.fd_indexPathHeightCache invalidateHeightAtIndexPath:indexPath];
+        [self invalidateCellHeightCacheAtIndexPath:indexPath];
         
         //if cell is visible, reload immediately
         NSArray *indexPaths = [self indexPathsForVisibleRows];
@@ -302,6 +315,25 @@
     animation==UITableViewRowAnimationNone?[UIView setAnimationsEnabled:YES]:nil;
 }
 
+- (void)cp_insertSectionInfo:(CPDataDrivenLayoutSectionInfo *)sectionInfo inSection:(NSInteger)inSection withRowAnimation:(UITableViewRowAnimation)animation {
+    CPDataDrivenLayoutEnabledAssert();
+    
+    if (sectionInfo) {
+        [self invalidateAllCellHeightCache];
+        
+        NSMutableArray *mSections = [self.sections mutableCopy];
+        if (inSection < self.sections.count) {
+            mSections[inSection] = sectionInfo;
+        } else {
+            [mSections addObject:sectionInfo];
+        }
+        
+        [self setSections:[mSections copy]];
+        [self registerCellWithSections:@[sectionInfo]];
+        [self insertSections:[NSIndexSet indexSetWithIndex:inSection] withRowAnimation:animation];
+    }
+}
+
 - (void)cp_insertCellInfos:(NSArray<CPDataDrivenLayoutCellInfo *> * _Nonnull)cellInfos atIndexPaths:(NSArray<NSIndexPath *> * _Nonnull)indexPaths withRowAnimation:(UITableViewRowAnimation)animation {
     CPDataDrivenLayoutEnabledAssert();
     
@@ -355,8 +387,10 @@
     
     if (sectionInfo.cellInfos.count==0) {
         NSMutableArray *newSections = [self.sections mutableCopy];
-        [newSections removeObjectAtIndex:indexPath.section];
-        [self setSections:[newSections copy]];
+        if (newSections && indexPath.section < newSections.count) {
+            [newSections removeObjectAtIndex:indexPath.section];
+            [self setSections:[newSections copy]];
+        }
     }
     
     animation==UITableViewRowAnimationNone?[UIView setAnimationsEnabled:NO]:nil;
@@ -434,6 +468,26 @@
     }else{
         [self registerClass:cellInfo.cellClass forCellReuseIdentifier:cellInfo.cellReuseIdentifier];
     }
+}
+
+#pragma mark - Invalidate Cell Cache Height
+
+- (void)invalidateCellHeightCacheInSection:(NSInteger)inSection {
+    CPDataDrivenLayoutSectionInfo *sectionInfo = [self cp_sectionInfoForSection:inSection];
+    if (sectionInfo) {
+        for (NSInteger row = 0; row < sectionInfo.numberOfObjects; row++) {
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:inSection];
+            [self invalidateCellHeightCacheAtIndexPath:indexPath];
+        }
+    }
+}
+
+- (void)invalidateCellHeightCacheAtIndexPath:(NSIndexPath *)indexPath {
+    [self.fd_indexPathHeightCache invalidateHeightAtIndexPath:indexPath];
+}
+
+- (void)invalidateAllCellHeightCache {
+    [self.fd_indexPathHeightCache invalidateAllHeightCache];
 }
 
 @end
