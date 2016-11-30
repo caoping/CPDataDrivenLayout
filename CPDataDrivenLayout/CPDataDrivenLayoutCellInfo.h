@@ -32,6 +32,7 @@ typedef void (^CPDataDrivenLayoutCellInfoCallbackBlock)(__kindof UITableView * _
 @property (nonatomic, readonly) UINib * _Nullable nib;//can be nil
 @property (nonatomic) NSString * _Nullable identifier;//string used to identify cell info
 @property (nonatomic) CGFloat rowHeight;//default value is UITableViewAutomaticDimension,mean use autolayout to calculate row height
+@property (nonatomic) CGFloat estimatedRowHeight;//The default value is 0, which means there is no estimate. Set a nonnegative height can use self-sizing to calculate row height
 @property (nonatomic) __kindof NSObject * _Nullable data;
 @property (nonatomic, copy) CPDataDrivenLayoutCellInfoCallbackBlock _Nullable cellDidReuseCallback;
 @property (nonatomic, copy) CPDataDrivenLayoutCellInfoCallbackBlock _Nullable cellDidSelectCallback;
