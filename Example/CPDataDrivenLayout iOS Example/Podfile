@@ -1,5 +1,9 @@
 source 'https://github.com/CocoaPods/Specs.git'
-#source 'git@gitlab.alibaba-inc.com:alipods/specs-mirror.git'
+#source "git@gitlab.alibaba-inc.com:alipods/specs.git"
+#source "git@gitlab.alibaba-inc.com:alipods/specs-mirror.git"
 
-platform :ios, '7.0'
-pod 'CPDataDrivenLayout', :path => '../..'
+target "CPDataDrivenLayout iOS Example" do
+	platform :ios, '7.0'
+	pod 'CPDataDrivenLayout', :path => '../..'
+	pod 'UITableView+FDTemplateLayoutCell', :git => 'https://github.com/forkingdog/UITableView-FDTemplateLayoutCell.git', :tag => '1.6'
+end
