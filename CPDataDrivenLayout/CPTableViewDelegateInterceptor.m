@@ -82,9 +82,10 @@ static Class __UIMutableIndexPathClass;
     CPDataDrivenLayoutCellInfo *cellInfo = [tableView cp_cellInfoForRowAtIndexPath:indexPath];
     if (cellInfo.rowHeight != UITableViewAutomaticDimension) {
         return cellInfo.rowHeight;
-    } else if (cellInfo.estimatedRowHeight > 0) {
-        return UITableViewAutomaticDimension;//use self sizing
     }
+//    else if (cellInfo.estimatedRowHeight > 0) {
+//        return UITableViewAutomaticDimension;//use self sizing
+//    }
     
     //use UITableView+FDTemplateLayoutCell to calculate row height (https://github.com/forkingdog/UITableView-FDTemplateLayoutCell)
     CGFloat height = [tableView fd_heightForCellWithIdentifier:cellInfo.cellReuseIdentifier cacheByIndexPath:indexPath configuration:^(UITableViewCell *cell) {
@@ -96,22 +97,22 @@ static Class __UIMutableIndexPathClass;
     return height;
 }
 
-- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (!__UIMutableIndexPathClass) {
-        __UIMutableIndexPathClass = NSClassFromString(@"UIMutableIndexPath");
-    }
-    
-    if ([indexPath isKindOfClass:__UIMutableIndexPathClass]) {
-        indexPath = [NSIndexPath indexPathForRow:indexPath.row inSection:indexPath.section];
-    }
-    
-    CPDataDrivenLayoutCellInfo *cellInfo = [tableView cp_cellInfoForRowAtIndexPath:indexPath];
-    if (cellInfo) {
-        return cellInfo.estimatedRowHeight;
-    }
-    
-    return 0;
-}
+//- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath {
+//    if (!__UIMutableIndexPathClass) {
+//        __UIMutableIndexPathClass = NSClassFromString(@"UIMutableIndexPath");
+//    }
+//    
+//    if ([indexPath isKindOfClass:__UIMutableIndexPathClass]) {
+//        indexPath = [NSIndexPath indexPathForRow:indexPath.row inSection:indexPath.section];
+//    }
+//    
+//    CPDataDrivenLayoutCellInfo *cellInfo = [tableView cp_cellInfoForRowAtIndexPath:indexPath];
+//    if (cellInfo) {
+//        return cellInfo.estimatedRowHeight;
+//    }
+//    
+//    return 0;
+//}
 
 #pragma mark - UITableViewDataSource
 
