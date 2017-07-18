@@ -26,16 +26,16 @@
 
 @interface _CPTableViewProxy : NSProxy
 
-@property (nonatomic, weak) id<NSObject> target;
-@property (nonatomic, weak) CPTableViewDelegateInterceptor *interceptor;
+@property (nonatomic, weak) id target;
+@property (nonatomic, weak) id interceptor;
 
-- (instancetype)initWithTarget:(id<NSObject>)target interceptor:(CPTableViewDelegateInterceptor *)interceptor;
+- (instancetype)initWithTarget:(id)target interceptor:(id)interceptor;
 
 @end
 
 @implementation _CPTableViewProxy
 
-- (instancetype)initWithTarget:(id<NSObject>)target interceptor:(CPTableViewDelegateInterceptor *)interceptor
+- (instancetype)initWithTarget:(id)target interceptor:(id)interceptor
 {
     if (!self) {
         return nil;
@@ -46,18 +46,49 @@
     return self;
 }
 
-- (BOOL)respondsToSelector:(SEL)aSelector
-{
-    return ([_interceptor respondsToSelector:aSelector] || [_target respondsToSelector:aSelector]);
+- (BOOL)respondsToSelector:(SEL)aSelector {
+    return [_interceptor respondsToSelector:aSelector] || [_target respondsToSelector:aSelector];
 }
 
-- (id)forwardingTargetForSelector:(SEL)aSelector
-{
-    if ([_interceptor respondsToSelector:aSelector]) {
-        return _interceptor;
+- (BOOL)conformsToProtocol:(Protocol *)aProtocol {
+    return [_interceptor conformsToProtocol:aProtocol] || [_target conformsToProtocol:aProtocol];
+}
+
+#pragma mark - Forward
+
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)sel {
+    NSMethodSignature *signature = [(id)_interceptor methodSignatureForSelector:sel];
+    if (signature) {
+        return signature;
     }
     
-    return [_target respondsToSelector:aSelector] ? _target : nil;
+    signature = [(id)_target methodSignatureForSelector:sel];
+    if (signature) {
+        return signature;
+    }
+    
+    return [[self class] voidSignature];//prevent crash when signature is nil
+}
+
+- (void)forwardInvocation:(NSInvocation *)invocation {
+    if ([invocation methodSignature] == [[self class] voidSignature]) {
+        return;
+    }
+    
+    if ([_interceptor respondsToSelector:invocation.selector]) {
+        [invocation invokeWithTarget:_interceptor];
+    } else if ([_target respondsToSelector:invocation.selector]) {
+        [invocation invokeWithTarget:_target];
+    }
+}
+
++ (NSMethodSignature *)voidSignature {
+    static NSMethodSignature *signature = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        signature = [NSMethodSignature signatureWithObjCTypes:@encode(void)];
+    });
+    return signature;
 }
 
 @end
@@ -180,6 +211,8 @@
 }
 
 - (void)cp_dealloc {
+    self.delegate = nil;
+    self.dataSource = nil;
     [self deleteDelegateProxy];
     [self deleteDataSourceProxy];
     [self cp_dealloc];
